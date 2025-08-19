@@ -113,22 +113,57 @@
 
 # LEGB --> Local, External, Global, BuiltIns
 
-s1 = "Global String"
+# s1 = "Global String"
 
-def Outer():
-    # global s1
+# def Outer():
+#     # global s1
+#     s1 = "Outer String"
 
-    def Inner():
-        # global s1
-        nonlocal s1
-        s1 = "Inner String"
-        print(f"Inner --> {s1}")
+#     print(f"{type(globals())}, {globals() = }")
+#     print(f"{type(locals())}, {locals() = }")
 
-    Inner()
-    s1 = "Outer String"
-    print(f"Outer --> {s1}")
+#     print(f"Global string in Outer --> {globals()['s1'] = }")
 
-Outer()
 
-print(f"Global --> {s1}")
+#     def Inner():
+#         # global s1
+#         # nonlocal s1
+#         s1 = "Inner String"
+#         print(f"Inner --> {s1}")
+
+#     Inner()
+#     print(f"Outer --> {s1}")
+
+# Outer()
+
+# print(f"Global --> {s1}")
 #endregion
+
+
+# region Comprehensions
+# Used to create a new collection, given an existing collection or generator
+
+fruits = ['apple', 'banana', 'custardapple', 'dragonfruit', 'kiwi']
+bowl = []
+for fr in fruits:
+    if 'a' in fr:
+        bowl.append(fr)
+
+print(f"{bowl = }")
+
+bowl = [fr       for fr in fruits          if 'a' in fr]
+print(f"{type(bowl)}, {bowl = }")
+
+bowl = {fr       for fr in fruits          if 'a' in fr}
+print(f"{type(bowl)}, {bowl = }")
+
+bowl = {fr:len(fr)       for fr in fruits          if 'a' in fr}
+print(f"{type(bowl)}, {bowl = }")
+
+bowl = tuple(fr       for fr in fruits          if 'a' in fr)
+print(f"{type(bowl)}, {bowl = }")
+
+
+nums = [1, 2, 3, 4, 5]
+squares = [x**2 for x in nums]
+print(f"{squares = }")
