@@ -11,4 +11,9 @@
     * Cmd Prompt --> `.venv-training\Scripts\activate.bat`
     * Power Shell --> `.venv-training\Scripts\activate.ps1`
 * Exit a virt. env. --> `deactivate`
+* Pip Commands
+    * `pip install <package_name>`
+    * `pip list` to list the installed packages
+    * `pip freeze > requirements.txt` to store the installed packages (and specific versions) into the file
+    * `pip install -r requirements.txt` to install packages specified in the file
 
