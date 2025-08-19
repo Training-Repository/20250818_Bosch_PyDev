@@ -122,21 +122,25 @@ def Outer():
 
     # print(f"Global string in Outer --> {globals()['s1'] = }")
 
-
     def Inner():
         # global s1
         nonlocal s1
         s1 = "Inner String"
-        print(f"Inner --> {s1}")
+        print(f"Inner --> {s1}, {id(s1) = }")
 
     Inner()
+    print(f"Trial --> {s1}, {id(s1) = }")
 
-    s1 = "Outer String"
-    print(f"Outer --> {s1}")
+    s1 = "Outer1 String"
+    print(f"Outer --> {s1}, {id(s1) = }")
+    s1 = "Outer2 String"
+    print(f"Outer --> {s1}, {id(s1) = }")
+    s1 = "Outer3 String"
+    print(f"Outer --> {s1}, {id(s1) = }")
 
 Outer()
 
-print(f"Global --> {s1}")
+print(f"Global --> {s1}, {id(s1) = }")
 #endregion
 
 
