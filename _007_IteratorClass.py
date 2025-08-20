@@ -29,8 +29,9 @@ def Test1():
 
 def Test2():
     myFib = FibGen(10)
-    it = iter(myFib)
-    for val in it:
+    # it = iter(myFib)
+    # for val in it:
+    for val in myFib:
         print(val)
     print("Done")
 
