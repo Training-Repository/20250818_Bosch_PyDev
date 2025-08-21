@@ -1,6 +1,18 @@
-## Version 1
+#region Version 1
 # def SayHello():
 #     print("Hello")
+
+# def SayHi():
+#     print("Hi")
+
+# # fn = SayHello
+
+# # def wrapper():
+# #     print("Calling SayHello...")
+# #     fn()
+# #     print("Exiting SayHello...")
+
+# # SayHello = wrapper
 
 # def LoggedVersion(fn):
 #     def wrapper():
@@ -10,9 +22,11 @@
 #     return wrapper
 
 # SayHello = LoggedVersion(SayHello)
+# SayHi = LoggedVersion(SayHi)
 
+#endregion
 
-# ## Version 2
+#region Version 2
 # def LoggedVersion(fn):
 #     def wrapper():
 #         print("Calling SayHello...")
@@ -20,13 +34,13 @@
 #         print("Exiting SayHello...")
 #     return wrapper
 
-
 # @LoggedVersion
 # def SayHello():
 #     print("Hello")
+#endregion
 
 
-## Version 3
+#region Version 3
 def LoggedVersion(fn):
     def wrapper():
         print(f"Calling {fn.__name__}...")
@@ -43,7 +57,7 @@ def SayHello():
 def SayHi():
     print("Hi")
 
-
+#endregion
 ##--------------------------------------------
 
 
