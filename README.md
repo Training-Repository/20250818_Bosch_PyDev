@@ -3,6 +3,7 @@
 * [Lexical analysis](https://docs.python.org/3/reference/lexical_analysis.html#lexical-analysis)
 * [Zen of Python](https://peps.python.org/pep-0020/)
 * [Exception Hierarchy](https://docs.python.org/3/library/exceptions.html#exception-hierarchy)
+* [Operator overloading](https://docs.python.org/3/library/operator.html#module-operator)
 
 ## Snippets
 * Create a virt. env --> `python -m venv .venv-training`
