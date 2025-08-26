@@ -19,19 +19,22 @@ class ThumbnailMakerService(object):
         self.output_dir = self.home_dir + os.path.sep + 'outgoing'
         self.downloaded_bytes = 0
         self.dl_lock = threading.Lock()
+        max_conurrency_dl = 4
+        self.dl_sem = threading.Semaphore(max_conurrency_dl)
 
     def download_image(self, url):
         # download each image and save to the input dir
-        logging.info("downloading image at " + url)
-        img_filename = urlparse(url).path.split('/')[-1]
-        dest_path = self.input_dir + os.path.sep + img_filename
-        urlretrieve(url, dest_path)
-        img_size = os.path.getsize(dest_path)
-        # start_lock_wait = time.perf_counter()
-        with self.dl_lock:
-            # end_lock_wait = time.perf_counter()
-            self.downloaded_bytes += img_size
-        logging.info(f"image [{img_size} bytes] saved to {dest_path}")
+        with self.dl_sem:
+            logging.info("downloading image at " + url)
+            img_filename = urlparse(url).path.split('/')[-1]
+            dest_path = self.input_dir + os.path.sep + img_filename
+            urlretrieve(url, dest_path)
+            img_size = os.path.getsize(dest_path)
+            # start_lock_wait = time.perf_counter()
+            with self.dl_lock:
+                # end_lock_wait = time.perf_counter()
+                self.downloaded_bytes += img_size
+            logging.info(f"image [{img_size} bytes] saved to {dest_path}")
 
     def download_images(self, img_url_list):        ## IO bound code
         # validate inputs
@@ -97,3 +100,11 @@ class ThumbnailMakerService(object):
 
         end = time.perf_counter()
         logging.info("END make_thumbnails in {} seconds".format(end - start))
+
+def run():
+    tn_maker = ThumbnailMakerService()
+    from test_thumbnail_maker import IMG_URLS
+    tn_maker.make_thumbnails(IMG_URLS)
+
+if __name__ == "__main__":
+    run()
