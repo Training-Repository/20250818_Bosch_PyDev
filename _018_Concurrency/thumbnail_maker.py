@@ -27,7 +27,9 @@ class ThumbnailMakerService(object):
         dest_path = self.input_dir + os.path.sep + img_filename
         urlretrieve(url, dest_path)
         img_size = os.path.getsize(dest_path)
+        # start_lock_wait = time.perf_counter()
         with self.dl_lock:
+            # end_lock_wait = time.perf_counter()
             self.downloaded_bytes += img_size
         logging.info(f"image [{img_size} bytes] saved to {dest_path}")
 
