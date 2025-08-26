@@ -1,4 +1,5 @@
 # thumbnail_maker.py
+import threading
 import time
 import os
 import logging
@@ -16,8 +17,21 @@ class ThumbnailMakerService(object):
         self.home_dir = home_dir
         self.input_dir = self.home_dir + os.path.sep + 'incoming'
         self.output_dir = self.home_dir + os.path.sep + 'outgoing'
+        self.downloaded_bytes = 0
+        self.dl_lock = threading.Lock()
 
-    def download_images(self, img_url_list):
+    def download_image(self, url):
+        # download each image and save to the input dir
+        logging.info("downloading image at " + url)
+        img_filename = urlparse(url).path.split('/')[-1]
+        dest_path = self.input_dir + os.path.sep + img_filename
+        urlretrieve(url, dest_path)
+        img_size = os.path.getsize(dest_path)
+        with self.dl_lock:
+            self.downloaded_bytes += img_size
+        logging.info(f"image [{img_size} bytes] saved to {dest_path}")
+
+    def download_images(self, img_url_list):        ## IO bound code
         # validate inputs
         if not img_url_list:
             return
@@ -26,14 +40,22 @@ class ThumbnailMakerService(object):
         logging.info("beginning image downloads")
 
         start = time.perf_counter()
+        threads = []
         for url in img_url_list:
-            # download each image and save to the input dir
-            img_filename = urlparse(url).path.split('/')[-1]
-            urlretrieve(url, self.input_dir + os.path.sep + img_filename)
-        end = time.perf_counter()
-        logging.info(f"downloaded {len(img_url_list)} images in {end - start} seconds")
+            # # download each image and save to the input dir
+            # img_filename = urlparse(url).path.split('/')[-1]
+            # urlretrieve(url, self.input_dir + os.path.sep + img_filename)
+            t = threading.Thread(target=self.download_image, args=(url,))
+            t.start()
+            threads.append(t)
 
-    def perform_resizing(self):
+        for t in threads:
+            t.join()
+
+        end = time.perf_counter()
+        logging.info(f"downloaded {len(img_url_list)} images [{self.downloaded_bytes} bytes] in {end - start} seconds")
+
+    def perform_resizing(self):     ## CPU bound code
         # validate inputs
         if not os.listdir(self.input_dir):
             return
