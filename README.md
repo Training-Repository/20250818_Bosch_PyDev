@@ -19,6 +19,13 @@
     * `pip freeze > requirements.txt` to store the installed packages (and specific versions) into the file
     * `pip install -r requirements.txt` to install packages specified in the file
 
+* Compare image resize project - Base to Latest
+    * `git reset --hard b655c03`
+    * `pytest _027_Concurrency_Revisit/`
+    * `git reset --hard origin/main`
+    * `pytest _027_Concurrency_Revisit/`
+
+
 ## Links
 * [Trainer/Training Feedback](https://forms.gle/e5txJ6TQftBp6hQz9)
 
