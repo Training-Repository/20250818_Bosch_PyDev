@@ -28,25 +28,28 @@ class ThumbnailMakerService(object):
         self.input_dir = self.home_dir + os.path.sep + 'incoming'
         self.output_dir = self.home_dir + os.path.sep + 'outgoing'
         self.img_queue = Queue()
+        self.url_queue = Queue()
 
-    def download_images(self, img_url_list):
-        # validate inputs
-        if not img_url_list:
-            return
+    def download_image(self):
         os.makedirs(self.input_dir, exist_ok=True)
 
         logging.info("beginning image downloads")
 
-        start = time.perf_counter()
-        for url in img_url_list:
-            # download each image and save to the input dir
-            img_filename = urlparse(url).path.split('/')[-1]
-            urlretrieve(url, self.input_dir + os.path.sep + img_filename)
-            logging.info(f"downloaded - {img_filename}")
-            self.img_queue.put(img_filename)
-        end = time.perf_counter()
-        logging.info(f"downloaded {len(img_url_list)} images in {end - start} seconds")
-        self.img_queue.put(None)    # Poison pill to end the consumer's wait
+        while not self.url_queue.empty():
+            try:
+                url = self.url_queue.get(block=False)
+
+                start = time.perf_counter()
+                # download each image and save to the input dir
+                img_filename = urlparse(url).path.split('/')[-1]
+                urlretrieve(url, self.input_dir + os.path.sep + img_filename)
+                end = time.perf_counter()
+                logging.info(f"downloaded - {img_filename} in {end-start} secs.")
+                self.img_queue.put(img_filename)
+                self.url_queue.task_done()
+            except Queue.Empty:
+                logging.info("URL queue is empty!")
+        # logging.info(f"downloaded {len(img_url_list)} images in {end - start} seconds")
 
     def perform_resizing(self):
         # validate inputs
@@ -90,16 +93,24 @@ class ThumbnailMakerService(object):
         logging.info("START make_thumbnails")
         start = time.perf_counter()
 
-        # self.download_images(img_url_list)
-        # self.perform_resizing()
+        for url in img_url_list:
+            self.url_queue.put(url)
 
-        t1 = Thread(target=self.download_images, args=(img_url_list,))
-        t2 = Thread(target=self.perform_resizing)
 
-        t1.start()
+        # Creating a pool of 4 ghreads and starting those
+        num_dl_threads = 4
+        for idx in range(num_dl_threads):
+            t1 = Thread(target=self.download_image, name=f"t_Dwnld[{idx}]")
+            t1.start()
+
+        t2 = Thread(target=self.perform_resizing, name="t_Resize")
         t2.start()
 
-        t1.join()
+        self.url_queue.join()       # Will wait for a thread to call "self.url_queue.task_done()"
+                                    # This iwll be done by the thread that encounters the queue whne it is empty.
+        
+        self.img_queue.put(None)
+
         t2.join()
 
         end = time.perf_counter()
