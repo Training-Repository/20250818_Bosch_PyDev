@@ -1,3 +1,6 @@
 pytest
 Pillow
 requests
+async_timeout
+aiohttp
+aiofiles
